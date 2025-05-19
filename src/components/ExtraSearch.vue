@@ -1,37 +1,59 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { useLocale } from 'element-plus'
+import { isUndefined } from 'es-toolkit'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import EpSearch from '~icons/ep/search'
 
 interface SearchConfig {
   token: string
+  label: string
   suggestions?: string[]
 }
 
+interface ModelItem {
+  token: string
+  value: string
+}
+
 interface Props {
-  modelValue: Record<string, string[]>[]
+  modelValue: ModelItem[]
   configs: SearchConfig[]
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Record<string, string>[]): void
-  (e: 'search', value: Record<string, string>[]): void
+  (e: 'update:modelValue', value: ModelItem[]): void
+  (e: 'search', value: ModelItem[]): void
 }>()
+
+const { t } = useLocale()
 
 const tokenMatchPattern = /(\S+):(\S*)/g
 
 const inputValue = ref('')
 
+const inputRef = useTemplateRef('input')
+
+// 获取所有有效的 token
+const validTokens = computed(() => props.configs.map(config => config.token))
+
 watch(() => props.modelValue, (value) => {
-  inputValue.value = value
+  // 过滤掉不在 configs 中的 token
+  const filteredValue = value.filter((item) => {
+    if (item.token === '')
+      return true
+    return validTokens.value.includes(item.token)
+  })
+
+  inputValue.value = filteredValue
     .map((item) => {
-      const key = Object.keys(item)[0]
-      const value = Object.values(item)[0]
-      return `${key}:${value}`
+      if (item.token === '')
+        return item.value
+      return `${item.token}:${item.value}`
     })
     .join(' ')
-}, { immediate: true, deep: true, once: true })
+}, { immediate: true, deep: true })
 
 const currentMatches = computed(() => {
   return Array.from(inputValue.value.matchAll(tokenMatchPattern))
@@ -47,28 +69,29 @@ watch(inputValue, (value) => {
         value: match[2],
       }
     }
-    return {
-      token: '',
-      value: word,
-    }
+    return undefined
+  }).filter((item): item is ModelItem => !isUndefined(item))
+
+  // 过滤掉不在 configs 中的 token
+  const filteredResult = result.filter((item) => {
+    if (item.token === '')
+      return true
+    return validTokens.value.includes(item.token)
   })
 
-  emit('update:modelValue', result)
+  emit('update:modelValue', filteredResult)
 })
 
 const currentSuggestionToken = computed(() => {
   const matches = currentMatches.value
+  const lastMatch = matches.at(-1)
 
-  if (matches.length > 0) {
-    const lastMatch = matches.at(-1)
-    if (!lastMatch)
-      return undefined
-    const [fullMatch, token] = lastMatch
+  if (!lastMatch)
+    return undefined
 
-    const remainingText = inputValue.value.slice(lastMatch.index! + fullMatch.length).trimEnd()
-    if (remainingText === '') {
-      return token
-    }
+  const remainingText = inputValue.value.slice(lastMatch.index! + lastMatch[0].length).trimEnd()
+  if (remainingText === '') {
+    return lastMatch[1]
   }
   return undefined
 })
@@ -76,6 +99,10 @@ const currentSuggestionToken = computed(() => {
 const currentSuggestions = computed(() => {
   const config = props.configs.find(config => config.token === currentSuggestionToken.value)
   return config?.suggestions || []
+})
+
+const usedTokens = computed(() => {
+  return [...new Set(props.modelValue.map(item => item.token))]
 })
 
 function handleSuggestionClick(suggestion: string) {
@@ -90,15 +117,26 @@ function handleSuggestionClick(suggestion: string) {
   }${key}:${suggestion}${
     inputValue.value.substring(lastMatch.index! + fullMatch.length)}`
 }
+
+function handleSearch() {
+  emit('search', props.modelValue)
+}
+
+function handleClickTag(token: string) {
+  emit('update:modelValue', [...props.modelValue, { token, value: '' }])
+  inputRef.value?.focus()
+}
 </script>
 
 <template>
   <el-card body-class="p-0 rounded-xl" shadow="never">
     <div class="flex flex-col">
       <ElInput
+        ref="input"
         v-model="inputValue"
-        :suffix-icon="EpSearch"
+        :prefix-icon="EpSearch"
         clearable
+        @keyup.enter="handleSearch"
       />
       <div v-show="currentSuggestions.length > 0" class="w-full flex flex-col items-start p-2">
         <ElText v-for="suggestion in currentSuggestions" :key="suggestion" size="small" class="w-full rounded cursor-pointer px-2 hover:bg-gray-100 p-1 text-left" @click="handleSuggestionClick(suggestion)">
@@ -106,11 +144,25 @@ function handleSuggestionClick(suggestion: string) {
         </ElText>
       </div>
     </div>
+    <template #footer>
+      <div class="flex flex-row flex-wrap items-center gap-2">
+        <ElText>{{ t('searchConditions') }}: </ElText>
+        <div class="flex flex-row gap-2">
+          <ElTag v-for="config in configs" :key="config.token" :class="{ 'is-used': usedTokens.includes(config.token) }" class="cursor-pointer" @click="handleClickTag(config.token)">
+            {{ config.label }}
+          </ElTag>
+        </div>
+      </div>
+    </template>
   </el-card>
 </template>
 
 <style scoped>
 .el-input {
     @apply rounded-xl;
+}
+
+.el-tag.is-used {
+    @apply border-blue;
 }
 </style>

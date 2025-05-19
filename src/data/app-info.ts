@@ -21,7 +21,7 @@ export type SearchAppInfosParams = PaginationParams & {
 
 export function searchAppInfos(params: SearchAppInfosParams) {
   return request<AppInfo[]>({
-    url: '/app-info/search',
+    url: '/api/app-info/search',
     params,
   })
 }

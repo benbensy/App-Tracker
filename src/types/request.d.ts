@@ -8,6 +8,6 @@ interface ApiResult<T = null> {
 }
 
 interface PaginationParams {
-  page: number
-  per: number
+  page?: number
+  per?: number
 }

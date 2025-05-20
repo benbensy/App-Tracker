@@ -1,14 +1,16 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-import AdminLayout from '@/layouts/AdminLayout.vue'
+import DesignerLayout from '@/layouts/DesignerLayout.vue'
 import BaseLayout from '@/layouts/BaseLayout.vue'
 import HomePage from '@/pages/HomePage.vue'
+import DesignerHomePage from '@/pages/DesignerHomePage.vue'
 
 const routes = [
   {
     name: 'root',
     path: '/',
     component: BaseLayout,
+    redirect: { name: 'home' },
     children: [
       {
         name: 'home',
@@ -18,10 +20,35 @@ const routes = [
     ],
   },
   {
-    name: 'admin-root',
-    path: '/admin',
-    component: AdminLayout,
+    name: 'designer-root',
+    path: '/designer',
+    component: DesignerLayout,
+    redirect: { name: 'designer-home' },
+    children: [
+      {
+        name: 'designer-home',
+        path: '/designer',
+        component: DesignerHomePage,
+      },
+    ],
   },
+  {
+    name: 'auth',
+    path: '/auth',
+    children: [
+      {
+        name: 'auth-sign-in',
+        path: 'signIn',
+        component: () => import('@/pages/SignInPage.vue'),
+      },
+      {
+        name: 'auth-sign-up',
+        path: 'signUp',
+        component: () => import('@/pages/SignUpPage.vue'),
+      },
+    ]
+  }
+  
 ] satisfies RouteRecordRaw[]
 
 export const router = createRouter({

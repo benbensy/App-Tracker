@@ -6,6 +6,14 @@ import { useAppStore } from '@/stores/appStore'
 
 type LocaleKey = keyof typeof locales
 
+interface Props {
+  size?: number
+}
+
+withDefaults(defineProps<Props>(), {
+  size: 20,
+})
+
 const appStore = useAppStore()
 
 const localeOptions = map(toPairs(locales), ([value, { description: label }]) => ({
@@ -22,7 +30,7 @@ function handleSelect(value: LocaleKey) {
   <ElDropdown trigger="click">
     <ElButtonGroup>
       <ElButton link>
-        <ElIcon :size="24">
+        <ElIcon :size="size">
           <MdiLanguage />
         </ElIcon>
       </ElButton>

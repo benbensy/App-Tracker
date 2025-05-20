@@ -20,8 +20,37 @@ export type SearchAppInfosParams = PaginationParams & {
 }
 
 export function searchAppInfos(params: SearchAppInfosParams) {
-  return request<AppInfo[]>({
+  return request<ApiResult<AppInfo[]>>({
     url: '/api/app-info/search',
     params,
+  })
+}
+
+export interface CreateOrUpdateAppInfoParams {
+  [index: number]: {
+    defaultName: string
+    localizedName: string
+    languageCode: string
+    packageName: string
+    mainActivity: string
+  }
+}
+
+export interface CreateOrUpdateAppInfoResult {
+  id: string
+  packageName: string
+  mainActivity: string
+  localizedNames: {
+    languageCode: string
+    name: string
+    isPrimary: boolean
+  }[]
+}
+
+export function createOrUpdateAppInfo(params: CreateOrUpdateAppInfoParams) {
+  return request<CreateOrUpdateAppInfoResult>({
+    url: '/api/app-info/create',
+    method: 'post',
+    data: params,
   })
 }

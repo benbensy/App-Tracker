@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import AppHeader from '@/components/biz/AppHeader.vue'
+import DesignerHeader from '@/components/biz/DesignerHeader.vue'
 </script>
 
 <template>
   <div class="w-full h-full flex flex-col">
     <div>
-      <AppHeader />
+      <DesignerHeader />
     </div>
     <main class="flex-1 overflow-y-auto">
       <RouterView />

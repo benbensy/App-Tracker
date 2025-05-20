@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { useLocale } from 'element-plus'
+import { ElMessage, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
 import { computed, ref } from 'vue'
-import ExtraSearch from '@/components/ExtraSearch.vue'
+import EpCopyDocument from '~icons/ep/copy-document'
+import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import { searchAppInfos } from '@/data/app-info'
 
 const { t } = useLocale()
@@ -36,7 +37,7 @@ const searchConfigs = computed(() => [
   },
 ])
 
-const { data, refetch } = useQuery({
+const { data, isLoading, refetch } = useQuery({
   queryKey: ['/app-info/search'],
   queryFn: () => searchAppInfos(pickBy({
     byName: byNameText.value,
@@ -49,6 +50,11 @@ const { data, refetch } = useQuery({
 function handleSearch() {
   refetch()
 }
+
+async function handleCopy(id: string) {
+  await navigator.clipboard.writeText(id)
+  ElMessage.success(t('success'))
+}
 </script>
 
 <template>
@@ -57,5 +63,21 @@ function handleSearch() {
       App Tracker for Icon Pack
     </ElText>
     <ExtraSearch v-model="searchModel" :configs="searchConfigs" @search="handleSearch" />
+    <ElTable
+      v-if="data"
+      v-loading="isLoading"
+      :data="data.data.items"
+      stripe
+    >
+      <ElTableColumn type="selection" />
+      <ElTableColumn prop="defaultName" :label="t('name')" />
+      <ElTableColumn prop="packageName" :label="t('packageName')" />
+      <ElTableColumn prop="mainActivity" :label="t('mainActivity')" />
+      <ElTableColumn :label="t('operation')" fixed="right">
+        <template #default="{ row }">
+          <ElButton link :icon="EpCopyDocument" @click="handleCopy(row.id)" />
+        </template>
+      </ElTableColumn>
+    </ElTable>
   </div>
 </template>

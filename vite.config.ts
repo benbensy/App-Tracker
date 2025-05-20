@@ -8,6 +8,7 @@ import icons from 'unplugin-icons/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import vueComponents from 'unplugin-vue-components/vite'
 import { defineConfig, loadEnv } from 'vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 const dirname = import.meta.dirname
 
@@ -23,6 +24,7 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
+      nodePolyfills(),
       autoImport({
         resolvers: [
           ElementPlusResolver({

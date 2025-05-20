@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ApkInfoType } from 'app-info-parser-dist/types'
 import type { UploadFile } from 'element-plus'
-import type { CreateOrUpdateAppInfoParams } from '@/data/app-info'
-import { useQuery } from '@tanstack/vue-query'
+
 import ApkParser from 'app-info-parser-dist'
 import { ElMessage, useLocale } from 'element-plus'
 
 import { computed, onErrorCaptured, ref, watch } from 'vue'
+import { useRequest } from 'vue-request'
 import EpPlus from '~icons/ep/plus'
 import { createOrUpdateAppInfo } from '@/data/app-info'
 import AppInfoSubForm from './AppInfoSubForm.vue'
@@ -37,7 +37,7 @@ const formValues = computed(() => {
 
   const result = parsedApkInfo.value?.application.label.map(item => ({
     defaultName,
-    languageCode: item.locate,
+    languageCode: item.region ? `${item.locate}-${item.region.split('-')[0]}` : item.locate,
     localizedName: item.value,
     packageName: parsedApkInfo.value!.package,
     mainActivity: parsedApkInfo.value!.application.launcherActivities.at(0)!.name,
@@ -46,10 +46,8 @@ const formValues = computed(() => {
   return result
 })
 
-const { refetch } = useQuery({
-  queryKey: ['/api/app-info/create'],
-  queryFn: () => createOrUpdateAppInfo(formValues.value),
-  enabled: false,
+const { runAsync } = useRequest(() => createOrUpdateAppInfo(formValues.value), {
+  manual: true,
 })
 
 function handleExceed() {
@@ -57,7 +55,7 @@ function handleExceed() {
 }
 
 async function handleSubmit() {
-  await refetch()
+  await runAsync()
   ElMessage.success(t('success'))
   emit('cancel')
 }

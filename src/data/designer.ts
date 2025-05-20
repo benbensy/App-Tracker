@@ -15,7 +15,7 @@ export interface SignInResult {
 
 export function signIn(params: SignInParams) {
   return request<SignInResult>({
-    url: '/api/designer/login',
+    url: '/designer/login',
     method: 'get',
     headers: {
       Authorization: `Basic ${btoa(`${params.email}:${params.password}`)}`,
@@ -29,7 +29,7 @@ export interface refreshTokenParams {
 
 export function refreshToken(params: refreshTokenParams) {
   return request({
-    url: '/api/designer/login',
+    url: '/designer/login',
     method: 'post',
     headers: {
       Authorization: `Bearer ${params.token}`,
@@ -53,7 +53,7 @@ export interface SignUpResult {
 
 export function signUp(params: SignUpParams) {
   return request<SignUpResult>({
-    url: '/api/designer/register',
+    url: '/designer/register',
     method: 'post',
     data: params,
   })

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
 import { ElMessage, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
 import { computed, ref } from 'vue'
+import { useRequest } from 'vue-request'
 import EpCopyDocument from '~icons/ep/copy-document'
 import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import { searchAppInfos } from '@/data/app-info'
@@ -14,6 +14,10 @@ const searchModel = ref<{ token: string, value: string }[]>([])
 const byNameText = computed(() => searchModel.value.filter(item => item.token === 'byName').map(item => item.value).join(' '))
 const byPackageNameText = computed(() => searchModel.value.filter(item => item.token === 'byPackageName').map(item => item.value).join(' '))
 const byMainActivityText = computed(() => searchModel.value.filter(item => item.token === 'byMainActivity').map(item => item.value).join(' '))
+const pagination = ref({
+  page: 1,
+  pageSize: 10,
+})
 
 const searchConfigs = computed(() => [
   {
@@ -37,18 +41,18 @@ const searchConfigs = computed(() => [
   },
 ])
 
-const { data, isLoading, refetch } = useQuery({
-  queryKey: ['/app-info/search'],
-  queryFn: () => searchAppInfos(pickBy({
-    byName: byNameText.value,
-    byPackageName: byPackageNameText.value,
-    byMainActivity: byMainActivityText.value,
-  }, Boolean)),
-  enabled: false,
+const { data, loading, runAsync } = useRequest(() => searchAppInfos(pickBy({
+  page: pagination.value.page,
+  pageSize: pagination.value.pageSize,
+  byName: byNameText.value,
+  byPackageName: byPackageNameText.value,
+  byMainActivity: byMainActivityText.value,
+}, Boolean)), {
+  manual: true,
 })
 
 function handleSearch() {
-  refetch()
+  runAsync()
 }
 
 async function handleCopy(id: string) {
@@ -63,21 +67,31 @@ async function handleCopy(id: string) {
       App Tracker for Icon Pack
     </ElText>
     <ExtraSearch v-model="searchModel" :configs="searchConfigs" @search="handleSearch" />
-    <ElTable
-      v-if="data"
-      v-loading="isLoading"
-      :data="data.data.items"
-      stripe
-    >
-      <ElTableColumn type="selection" />
-      <ElTableColumn prop="defaultName" :label="t('name')" />
-      <ElTableColumn prop="packageName" :label="t('packageName')" />
-      <ElTableColumn prop="mainActivity" :label="t('mainActivity')" />
-      <ElTableColumn :label="t('operation')" fixed="right">
-        <template #default="{ row }">
-          <ElButton link :icon="EpCopyDocument" @click="handleCopy(row.id)" />
-        </template>
-      </ElTableColumn>
-    </ElTable>
+    <div class="flex-1 flex flex-col items-end gap-4">
+      <ElTable
+        v-if="data"
+        v-loading="loading"
+        :data="data.data.items"
+        stripe
+      >
+        <ElTableColumn type="selection" />
+        <ElTableColumn prop="defaultName" :label="t('name')" />
+        <ElTableColumn prop="packageName" :label="t('packageName')" />
+        <ElTableColumn prop="mainActivity" :label="t('mainActivity')" />
+        <ElTableColumn :label="t('operation')" fixed="right">
+          <template #default="{ row }">
+            <ElButton link :icon="EpCopyDocument" @click="handleCopy(row.id)" />
+          </template>
+        </ElTableColumn>
+      </ElTable>
+      <ElPagination
+        v-model:current-page="pagination.page"
+        v-model:page-size="pagination.pageSize"
+        :total="data?.data.metadata.total"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="handleSearch"
+        @size-change="handleSearch"
+      />
+    </div>
   </div>
 </template>

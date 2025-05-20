@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/vue-query": "^5.76.0",
     "@vueuse/core": "^13.2.0",
     "@vueuse/rxjs": "^13.2.0",
     "app-info-parser-dist": "git+https://github.com/benbensy/app-info-parser.git#develop",
@@ -21,6 +20,7 @@
     "pinia-plugin-persistedstate": "^4.3.0",
     "rxjs": "^7.8.2",
     "vue": "^3.5.13",
+    "vue-request": "^2.0.4",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

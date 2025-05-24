@@ -17,7 +17,7 @@ function goToDesigner() {
 </script>
 
 <template>
-  <div class="sticky top-0 z-10 w-full flex justify-between items-center px-4 py-2 shadow backdrop-blur-md gap-4 bg-white/80">
+  <div class="sticky top-0 z-10 w-full flex justify-between items-center px-4 py-2 shadow backdrop-blur-md gap-4">
     <RouterLink class="cursor-pointer" :to="{ name: 'home' }" custom>
       <template #default="{ navigate }">
         <ElImage :style="{ height: '32px' }" fit="contain" :z-index="999" :src="LogoSrc" alt="Logo" @click="navigate()" />

@@ -17,7 +17,7 @@ const byPackageNameText = computed(() => searchModel.value.filter(item => item.t
 const byMainActivityText = computed(() => searchModel.value.filter(item => item.token === 'byMainActivity').map(item => item.value).join(' '))
 const pagination = ref({
   page: 1,
-  pageSize: 10,
+  per: 10,
 })
 
 const searchConfigs = computed(() => [
@@ -46,7 +46,7 @@ const extraSearchRef = useTemplateRef('extraSearchRef')
 
 const { data, loading, runAsync } = useRequest(() => searchAppInfos(pickBy({
   page: pagination.value.page,
-  pageSize: pagination.value.pageSize,
+  per: pagination.value.per,
   byName: byNameText.value,
   byPackageName: byPackageNameText.value,
   byMainActivity: byMainActivityText.value,
@@ -79,9 +79,26 @@ async function handleCopy(id: string) {
         v-if="data"
         v-loading="loading"
         :data="data.data.items"
-        stripe
       >
-        <ElTableColumn type="selection" />
+        <ElTableColumn width="32" type="selection" />
+        <ElTableColumn width="32" type="expand">
+          <template #default="{ row }">
+            <ElForm class="px-16 py-2 bg-gray-50">
+              <ElFormItem :label="`${t('icon')}: `">
+                <ElImage class="w-10 h-10" fit="contain" :src="`/api/app-icon?packageName=${row.packageName}`" />
+              </ElFormItem>
+              <ElFormItem :label="`${t('name')}: `">
+                {{ row.defaultName }}
+              </ElFormItem>
+              <ElFormItem :label="`${t('packageName')}: `">
+                {{ row.packageName }}
+              </ElFormItem>
+              <ElFormItem :label="`${t('mainActivity')}: `">
+                {{ row.mainActivity }}
+              </ElFormItem>
+            </ElForm>
+          </template>
+        </ElTableColumn>
         <ElTableColumn prop="defaultName" :label="t('name')" />
         <ElTableColumn prop="packageName" :label="t('packageName')" />
         <ElTableColumn prop="mainActivity" :label="t('mainActivity')" />
@@ -93,7 +110,7 @@ async function handleCopy(id: string) {
       </ElTable>
       <ElPagination
         v-model:current-page="pagination.page"
-        v-model:page-size="pagination.pageSize"
+        v-model:page-size="pagination.per"
         :total="data?.data.metadata.total || 0"
         layout="total, sizes, prev, pager, next, jumper"
         background

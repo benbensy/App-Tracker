@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { ApkInfoType } from 'app-info-parser-dist/types'
-import type { UploadFile } from 'element-plus'
+import type { UploadFile, UploadRawFile, UploadUserFile } from 'element-plus'
 
 import ApkParser from 'app-info-parser-dist'
 import { ElMessage, useLocale } from 'element-plus'
 
-import { computed, onErrorCaptured, ref, watch } from 'vue'
+import { computed, onErrorCaptured, ref, useTemplateRef, watch } from 'vue'
 import { useRequest } from 'vue-request'
 import EpPlus from '~icons/ep/plus'
 import { createOrUpdateAppInfo } from '@/data/app-info'
@@ -16,6 +16,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useLocale()
+
+const uploadRef = useTemplateRef('uploadRef')
 
 const apkFileList = ref<UploadFile[]>([])
 
@@ -46,12 +48,14 @@ const formValues = computed(() => {
   return result
 })
 
-const { runAsync } = useRequest(() => createOrUpdateAppInfo(formValues.value), {
+const { runAsync, loading } = useRequest(() => createOrUpdateAppInfo(formValues.value), {
   manual: true,
 })
 
-function handleExceed() {
-  ElMessage.error(t('uploadExceed'))
+function handleExceed(files: File[]) {
+  uploadRef.value?.clearFiles()
+  const file = files[0] as UploadRawFile
+  uploadRef.value!.handleStart(file)
 }
 
 async function handleSubmit() {
@@ -69,7 +73,7 @@ onErrorCaptured((error) => {
   <ElCard>
     <div class="w-full flex flex-col gap-2">
       <div class="text-left" size="large">
-        <ElUpload v-model:file-list="apkFileList" accept=".apk" :auto-upload="false" :limit="1" @exceed="handleExceed">
+        <ElUpload ref="uploadRef" v-model:file-list="apkFileList" accept=".apk" :auto-upload="false" :limit="1" :disabled="loading" @exceed="handleExceed">
           <ElButton :icon="EpPlus">
             {{ t('parseApk') }}
           </ElButton>
@@ -95,10 +99,10 @@ onErrorCaptured((error) => {
     </ElTabs>
     <template #footer>
       <div class="w-full flex justify-end gap-2">
-        <ElButton @click="$emit('cancel')">
+        <ElButton :disabled="loading" @click="$emit('cancel')">
           {{ t('cancel') }}
         </ElButton>
-        <ElButton type="primary" @click="handleSubmit">
+        <ElButton type="primary" :disabled="apkFileList.length === 0" :loading="loading" @click="handleSubmit">
           {{ t('save') }}
         </ElButton>
       </div>

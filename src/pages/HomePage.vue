@@ -87,8 +87,9 @@ async function handleCopy(id: string) {
       <ElPagination
         v-model:current-page="pagination.page"
         v-model:page-size="pagination.pageSize"
-        :total="data?.data.metadata.total"
+        :total="data?.data.metadata.total || 0"
         layout="total, sizes, prev, pager, next, jumper"
+        background
         @current-change="handleSearch"
         @size-change="handleSearch"
       />

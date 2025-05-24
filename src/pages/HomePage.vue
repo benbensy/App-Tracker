@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ElMessage, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import EpCopyDocument from '~icons/ep/copy-document'
-import EpSearch from '~icons/ep/search'
 import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import { searchAppInfos } from '@/data/app-info'
 
@@ -42,8 +41,7 @@ const searchConfigs = computed(() => [
   },
 ])
 
-const extraSearchRef = useTemplateRef('extraSearchRef')
-
+const hasSearched = ref(false)
 const { data, loading, runAsync } = useRequest(() => searchAppInfos(pickBy({
   page: pagination.value.page,
   per: pagination.value.per,
@@ -52,6 +50,10 @@ const { data, loading, runAsync } = useRequest(() => searchAppInfos(pickBy({
   byMainActivity: byMainActivityText.value,
 }, Boolean)), {
   manual: true,
+  debounceInterval: 300,
+  onBefore: () => {
+    hasSearched.value = true
+  },
 })
 
 function handleSearch() {
@@ -69,16 +71,12 @@ async function handleCopy(id: string) {
     <ElText class="text-2xl font-bold">
       App Tracker for Icon Pack
     </ElText>
-    <ExtraSearch ref="extraSearchRef" v-model="searchModel" :configs="searchConfigs" :placeholder="t('searchPlaceholder')" @search="handleSearch">
-      <template #append>
-        <ElButton :icon="EpSearch" @click="extraSearchRef?.search()" />
-      </template>
-    </ExtraSearch>
+    <ExtraSearch v-model="searchModel" :configs="searchConfigs" :placeholder="t('searchPlaceholder')" @search="handleSearch" />
     <div class="flex-1 flex flex-col items-end gap-4">
       <ElTable
-        v-if="data"
+        v-if="hasSearched || data"
         v-loading="loading"
-        :data="data.data.items"
+        :data="data?.data?.items || []"
       >
         <ElTableColumn width="32" type="selection" />
         <ElTableColumn width="32" type="expand">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ApkInfoType } from 'app-info-parser-dist/types'
-import type { UploadFile, UploadRawFile, UploadUserFile } from 'element-plus'
+import type { UploadFile, UploadRawFile } from 'element-plus'
 
 import ApkParser from 'app-info-parser-dist'
 import { ElMessage, useLocale } from 'element-plus'

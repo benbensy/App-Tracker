@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { useLocale } from 'element-plus'
+import type { FormItemProp } from 'element-plus'
+import { ElMessage, useLocale } from 'element-plus'
 import { isUndefined } from 'es-toolkit'
-import { computed, ref, useTemplateRef, watch } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import EpSearch from '~icons/ep/search'
+import { useForm } from '@/composables/useForm'
 
 interface SearchConfig {
   token: string | undefined
@@ -36,15 +38,31 @@ const { t } = useLocale()
 
 const tokenMatchPattern = new RegExp(`(\\S+)?${props.predicate}(\\S*)`, 'g')
 
-const inputValue = ref('')
-
-const inputRef = useTemplateRef('input')
-
-const currentMatches = computed(() => {
-  return Array.from(inputValue.value.matchAll(tokenMatchPattern))
+const { formRef, formValues, createRules, submit, clearValidate } = useForm({
+  initialValues: {
+    inputValue: '',
+  },
+  onSubmit() {
+    emit('search', props.modelValue)
+  },
 })
 
-watch(inputValue, (value) => {
+const rules = createRules(() => ({
+  inputValue: [
+    { validator: (_rule, _value, callback) => {
+      if (props.modelValue.length === 0) {
+        callback(new Error(t('inputValueRequired')))
+      }
+      callback()
+    }, message: '', trigger: [] },
+  ],
+}))
+
+const currentMatches = computed(() => {
+  return Array.from(formValues.value.inputValue.matchAll(tokenMatchPattern))
+})
+
+watch(() => formValues.value.inputValue, (value) => {
   const inputWords = value.split(/\s+/).filter(Boolean)
   const result = inputWords.map((word) => {
     const match = currentMatches.value.find(m => m[0] === word)
@@ -64,7 +82,7 @@ watch(inputValue, (value) => {
 })
 
 watch(() => props.modelValue, (value) => {
-  inputValue.value = value
+  formValues.value.inputValue = value
     .map((item) => {
       if (item.token === undefined)
         return item.value
@@ -82,7 +100,7 @@ const currentSuggestionToken = computed(() => {
   if (!lastMatch || isEndWithEmpty)
     return undefined
 
-  const remainingText = inputValue.value.slice(lastMatch.index! + lastMatch[0].length).trimEnd()
+  const remainingText = formValues.value.inputValue.slice(lastMatch.index! + lastMatch[0].length).trimEnd()
   if (remainingText === '') {
     return lastMatch[1]
   }
@@ -106,50 +124,53 @@ function handleClickSuggestion(suggestion: string) {
   const lastMatch = matches[matches.length - 1]
   const [fullMatch, key] = lastMatch
 
-  inputValue.value = `${inputValue.value.substring(0, lastMatch.index)
+  formValues.value.inputValue = `${formValues.value.inputValue.substring(0, lastMatch.index)
   }${key}${props.predicate}${suggestion}${
-    inputValue.value.substring(lastMatch.index! + fullMatch.length)}`
-}
-
-function handleSearch() {
-  emit('search', props.modelValue)
+    formValues.value.inputValue.substring(lastMatch.index! + fullMatch.length)}`
 }
 
 async function handleClickTag(token: string | undefined) {
-  if (inputValue.value.endsWith(' ')) {
-    inputValue.value += `${token}${props.predicate}`
+  if (formValues.value.inputValue.endsWith(' ')) {
+    formValues.value.inputValue += `${token}${props.predicate}`
   }
   else {
-    inputValue.value += ` ${token}${props.predicate}`
+    formValues.value.inputValue += ` ${token}${props.predicate}`
   }
 }
 
 defineExpose({
-  search: handleSearch,
+  search: submit,
 })
 
 const isFocused = ref(false)
+
+function handleValidate(_prop: FormItemProp, isValid: boolean) {
+  if (!isValid) {
+    ElMessage.error(t('inputValueRequired'))
+  }
+}
 </script>
 
 <template>
   <el-card body-class="p-0 rounded-xl" shadow="never">
     <div class="flex flex-col">
-      <div>
-        <ElInput
-          ref="input"
-          v-model="inputValue"
-          :prefix-icon="EpSearch"
-          clearable
-          :placeholder="placeholder"
-          @keyup.enter="handleSearch"
-          @focus="isFocused = true"
-          @blur="isFocused = false"
-        >
-          <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
-            <slot :name="name" v-bind="slotProps" />
-          </template>
-        </ElInput>
-      </div>
+      <ElForm ref="formRef" :model="formValues" :rules="rules" @validate="handleValidate">
+        <ElFormItem class="mb-0" prop="inputValue">
+          <ElInput
+            v-model="formValues.inputValue"
+            :prefix-icon="EpSearch"
+            clearable
+            :placeholder="placeholder"
+            @keyup.enter="submit()"
+            @focus="isFocused = true; clearValidate()"
+            @blur="isFocused = false"
+          >
+            <template #append>
+              <ElButton :icon="EpSearch" @click="submit()" />
+            </template>
+          </ElInput>
+        </ElFormItem>
+      </ElForm>
       <div v-show="currentSuggestions.length > 0 && isFocused" class="w-full flex flex-col items-start p-2">
         <ElText v-for="suggestion in currentSuggestions" :key="suggestion" size="small" class="w-full rounded cursor-pointer px-2 hover:bg-gray-100 p-1 text-left" @click="handleClickSuggestion(suggestion)" @mousedown.prevent>
           {{ suggestion }}

@@ -17,4 +17,5 @@ export default {
   save: 'Save',
   uploadExceed: 'Upload Exceed',
   searchPlaceholder: 'Input keyword to search app, for example: QQ, support condition search, for example: byName:QQ',
+  inputValueRequired: 'Input value required',
 }

@@ -1,9 +1,9 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-import DesignerLayout from '@/layouts/DesignerLayout.vue'
 import BaseLayout from '@/layouts/BaseLayout.vue'
-import HomePage from '@/pages/HomePage.vue'
+import DesignerLayout from '@/layouts/DesignerLayout.vue'
 import DesignerHomePage from '@/pages/DesignerHomePage.vue'
+import HomePage from '@/pages/HomePage.vue'
 
 const routes = [
   {
@@ -46,9 +46,9 @@ const routes = [
         path: 'signUp',
         component: () => import('@/pages/SignUpPage.vue'),
       },
-    ]
-  }
-  
+    ],
+  },
+
 ] satisfies RouteRecordRaw[]
 
 export const router = createRouter({

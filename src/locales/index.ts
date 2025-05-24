@@ -7,10 +7,10 @@ import zhCn from './zh-cn'
 export default {
   en: {
     description: 'English (US)',
-    translation: merge(elEn, en)
+    translation: merge(elEn, en),
   },
   zhCn: {
     description: '简体中文',
-    translation: merge(elZhCn, zhCn)
+    translation: merge(elZhCn, zhCn),
   },
 }

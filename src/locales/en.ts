@@ -22,4 +22,5 @@ export default {
   searchPlaceholder: 'Input keyword to search app, for example: QQ, support condition search, for example: byName:QQ',
   inputValueRequired: 'Input value required',
   copySuccess: 'Copy success',
+  icon: 'Icon',
 }

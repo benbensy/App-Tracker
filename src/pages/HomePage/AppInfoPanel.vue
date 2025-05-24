@@ -1,53 +1,42 @@
 <script setup lang="ts">
 import { useLocale } from 'element-plus'
 
-const { t } = useLocale()
-
 defineProps<{ row: any }>()
+
+const { t } = useLocale()
 </script>
 
 <template>
-    <div class="px-8 py-8 bg-gray-50 grid grid-cols-2 gap-2">
-              <ElFormItem class="col-span-2">
-                <template #label>
-                    <ElText>
-                        {{ t('icon') }}:
-                    </ElText>
-                </template>
-                <ElImage class="w-10 h-10" fit="contain" :src="`/api/app-icon?packageName=${row.packageName}`" />
-              </ElFormItem>
-              <ElFormItem class="col-span-2">
-                <template #label>
-                    <ElText>
-                        {{ t('name') }}:
-                    </ElText>
-                </template>
-                <ElText>
-                    {{ row.defaultName }}
-                </ElText>
-              </ElFormItem>
-              <ElFormItem class="col-span-2">
-                <template #label>
-                    <ElText>
-                        {{ t('packageName') }}:
-                    </ElText>
-                </template>
-                <ElText>
-                    {{ row.packageName }}
-                </ElText>
-              </ElFormItem>
-              <ElFormItem class="col-span-2">
-                <template #label>
-                    <ElText>
-                        {{ t('mainActivity') }}:
-                    </ElText>
-                </template>
-                <ElText>
-                    {{ row.mainActivity }}
-                </ElText>
-              </ElFormItem>
-            </div>
-</template>
+    <div class="w-full h-full p-6 bg-gray-50 flex flex-col gap-2">
+      <!-- App Icon -->
+      <div class="flex items-center gap-4">
+        <ElText class="w-20 flex-shrink-0">{{ t('icon') }}:</ElText>
+        <ElImage 
+          class="w-10 h-10" 
+          fit="contain" 
+          :src="`/api/app-icon?packageName=${row.packageName}`" 
+        />
+      </div>
+  
+      <!-- App Name -->
+      <div class="flex gap-4">
+        <ElText class="w-20 flex-shrink-0">{{ t('name') }}:</ElText>
+        <ElText class="flex-1">{{ row.defaultName }}</ElText>
+      </div>
+  
+      <!-- Package Name -->
+      <div class="flex gap-4">
+        <ElText class="w-20 flex-shrink-0">{{ t('packageName') }}:</ElText>
+        <ElText class="flex-1">{{ row.packageName }}</ElText>
+      </div>
+  
+      <!-- Main Activity -->
+      <div class="flex gap-4">
+        <ElText class="w-20 flex-shrink-0">{{ t('mainActivity') }}:</ElText>
+        <ElText class="flex-1">{{ row.mainActivity }}</ElText>
+      </div>
+    </div>
+  </template>
 
 <style scoped>
 .el-form-item {

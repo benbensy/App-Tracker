@@ -3,9 +3,9 @@ import { ElMessage, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
 import { computed, ref } from 'vue'
 import { useRequest } from 'vue-request'
-import EpCopyDocument from '~icons/ep/copy-document'
 import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import { searchAppInfos } from '@/data/app-info'
+import AppInfoPanel from '@/pages/HomePage/AppInfoPanel.vue'
 
 const { t } = useLocale()
 
@@ -23,11 +23,7 @@ const searchConfigs = computed(() => [
   {
     token: 'byName',
     label: t('name'),
-    suggestions: [
-      'QQ',
-      'WeChat',
-      'Weibo',
-    ],
+    suggestions: [],
   },
   {
     token: 'byPackageName',
@@ -60,53 +56,58 @@ function handleSearch() {
   runAsync()
 }
 
-async function handleCopy(id: string) {
-  await navigator.clipboard.writeText(id)
-  ElMessage.success(t('success'))
+async function handleCopy(row: any, prop: string) {
+  await navigator.clipboard.writeText(row[prop])
+  ElMessage.success(t('copySuccess'))
+}
+
+const selectedRows = ref<any[]>([])
+
+function handleSelectionChange(selection: any[]) {
+  console.log(selection);
+  
+  selectedRows.value = selection
 }
 </script>
 
 <template>
-  <div class="w-full max-w-5xl h-full p-4 flex flex-col gap-4">
-    <ElText class="text-2xl font-bold">
-      App Tracker for Icon Pack
-    </ElText>
-    <ExtraSearch v-model="searchModel" :configs="searchConfigs" :placeholder="t('searchPlaceholder')" @search="handleSearch" />
-    <div class="flex-1 flex flex-col items-end gap-4">
-      <ElTable
-        v-if="hasSearched || data"
-        v-loading="loading"
+  <div class="w-full max-w-6xl h-full p-4 flex flex-col gap-4">
+
+    <div class="mx-auto w-full">
+      <ExtraSearch v-model="searchModel" :configs="searchConfigs" :placeholder="t('searchPlaceholder')" @search="handleSearch" />
+    </div>
+    <div class="w-full flex-1 flex flex-col gap-4">
+      <div class="w-full flex flex-row justify-between gap-4">
+        <div v-loading="loading" class="w-full flex-1 grid gap-4" v-if="hasSearched || data">
+        <ElTable
         :data="data?.data?.items || []"
+        @selection-change="handleSelectionChange"
       >
         <ElTableColumn width="32" type="selection" />
-        <ElTableColumn width="32" type="expand">
+        <ElTableColumn prop="defaultName" :label="t('name')">
           <template #default="{ row }">
-            <ElForm class="px-16 py-2 bg-gray-50">
-              <ElFormItem :label="`${t('icon')}: `">
-                <ElImage class="w-10 h-10" fit="contain" :src="`/api/app-icon?packageName=${row.packageName}`" />
-              </ElFormItem>
-              <ElFormItem :label="`${t('name')}: `">
-                {{ row.defaultName }}
-              </ElFormItem>
-              <ElFormItem :label="`${t('packageName')}: `">
-                {{ row.packageName }}
-              </ElFormItem>
-              <ElFormItem :label="`${t('mainActivity')}: `">
-                {{ row.mainActivity }}
-              </ElFormItem>
-            </ElForm>
+            <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'defaultName')">
+              {{ row.defaultName }}
+            </ElText>
           </template>
         </ElTableColumn>
-        <ElTableColumn prop="defaultName" :label="t('name')" />
-        <ElTableColumn prop="packageName" :label="t('packageName')" />
-        <ElTableColumn prop="mainActivity" :label="t('mainActivity')" />
-        <ElTableColumn :label="t('operation')" fixed="right">
+        <ElTableColumn prop="packageName" :label="t('packageName')">
           <template #default="{ row }">
-            <ElButton link :icon="EpCopyDocument" @click="handleCopy(row.id)" />
+            <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'packageName')">
+              {{ row.packageName }}
+            </ElText>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn prop="mainActivity" :label="t('mainActivity')">
+          <template #default="{ row }">
+            <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'mainActivity')">
+              {{ row.mainActivity }}
+            </ElText>
           </template>
         </ElTableColumn>
       </ElTable>
-      <ElPagination
+      <div class="w-full flex justify-end">
+        <ElPagination
         v-model:current-page="pagination.page"
         v-model:page-size="pagination.per"
         :total="data?.data.metadata.total || 0"
@@ -115,6 +116,12 @@ async function handleCopy(id: string) {
         @current-change="handleSearch"
         @size-change="handleSearch"
       />
+      </div>
+      </div>
+      <div v-if="selectedRows.length > 0">
+        <AppInfoPanel :row="selectedRows.at(-1)" />
+      </div>
+      </div>
     </div>
   </div>
 </template>

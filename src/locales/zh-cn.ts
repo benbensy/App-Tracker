@@ -1,4 +1,7 @@
 export default {
+  app: {
+    title: 'App Tracker for Icon Pack',
+  },
   name: '名称',
   packageName: '包名',
   mainActivity: '主活动',
@@ -18,4 +21,5 @@ export default {
   uploadExceed: '上传文件超过限制',
   searchPlaceholder: '输入关键字查询应用，例如：QQ，支持条件查询，例如：byName:QQ',
   inputValueRequired: '请输入搜索内容',
+  copySuccess: '复制成功',
 }

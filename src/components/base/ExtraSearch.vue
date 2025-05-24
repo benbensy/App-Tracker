@@ -19,7 +19,7 @@ interface ModelItem {
 
 interface Props {
   modelValue: ModelItem[]
-  configs: SearchConfig[]
+  configs?: SearchConfig[]
   predicate?: string
   placeholder?: string
 }
@@ -108,7 +108,7 @@ const currentSuggestionToken = computed(() => {
 })
 
 const currentSuggestions = computed(() => {
-  const config = props.configs.find(config => config.token === currentSuggestionToken.value)
+  const config = props.configs?.find(config => config.token === currentSuggestionToken.value)
   return config?.suggestions || []
 })
 
@@ -154,7 +154,7 @@ function handleValidate(_prop: FormItemProp, isValid: boolean) {
 <template>
   <el-card body-class="p-0 rounded-xl" shadow="never">
     <div class="flex flex-col">
-      <ElForm ref="formRef" :model="formValues" :rules="rules" @validate="handleValidate">
+      <ElForm ref="formRef" :model="formValues" :rules="rules" @validate="handleValidate" @submit.prevent>
         <ElFormItem class="mb-0" prop="inputValue">
           <ElInput
             v-model="formValues.inputValue"
@@ -191,11 +191,20 @@ function handleValidate(_prop: FormItemProp, isValid: boolean) {
 </template>
 
 <style scoped>
+
+.el-card {
+    @apply border-0;
+}
+
 .el-input {
     @apply rounded-xl;
 }
 
 .el-tag.is-used {
     @apply border-blue;
+}
+
+:deep(.el-card__footer) {
+    @apply border-t-0;
 }
 </style>

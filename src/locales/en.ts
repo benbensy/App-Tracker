@@ -1,4 +1,7 @@
 export default {
+  app: {
+    title: 'App Tracker for Icon Pack',
+  },
   name: 'Name',
   packageName: 'Package Name',
   mainActivity: 'Main Activity',
@@ -18,4 +21,5 @@ export default {
   uploadExceed: 'Upload Exceed',
   searchPlaceholder: 'Input keyword to search app, for example: QQ, support condition search, for example: byName:QQ',
   inputValueRequired: 'Input value required',
+  copySuccess: 'Copy success',
 }

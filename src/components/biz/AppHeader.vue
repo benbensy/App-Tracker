@@ -17,7 +17,9 @@ function goToDesigner() {
 </script>
 
 <template>
-  <div class="sticky top-0 z-10 w-full flex justify-between items-center px-4 py-2 shadow backdrop-blur-md gap-4">
+  <div class="sticky top-0 z-10 w-full px-4 py-2">
+    <div class="w-full backdrop-blur-md bg-white rounded-xl">
+      <div class=" w-full max-w-6xl mx-auto flex justify-between items-center px-8 py-2 gap-4">
     <RouterLink class="cursor-pointer" :to="{ name: 'home' }" custom>
       <template #default="{ navigate }">
         <ElImage :style="{ height: '32px' }" fit="contain" :z-index="999" :src="LogoSrc" alt="Logo" @click="navigate()" />
@@ -25,7 +27,7 @@ function goToDesigner() {
     </RouterLink>
 
     <el-text size="large" type="primary" class="mr-auto pointer-events-none">
-      App Tracker
+      {{ t('app.title') }}
     </el-text>
 
     <div class="flex items-center gap-4">
@@ -49,5 +51,8 @@ function goToDesigner() {
     <ElDrawer v-model="uploadDrawerVisible" size="100%" :title="t('uploadAppInfo')" append-to-body :open-delay="50" :lock-scroll="false" :modal="false" direction="btt" destroy-on-close>
       <UploadAppInfo @cancel="uploadDrawerVisible = false" />
     </ElDrawer>
+  </div>
+    </div>
+    
   </div>
 </template>

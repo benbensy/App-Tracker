@@ -1,7 +1,7 @@
 import path from 'node:path'
 import process from 'node:process'
 import vue from '@vitejs/plugin-vue'
-import { transformerDirectives } from 'unocss'
+import { transformerDirectives, transformerVariantGroup } from 'unocss'
 import unocss from 'unocss/vite'
 import autoImport from 'unplugin-auto-import/vite'
 import icons from 'unplugin-icons/vite'
@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => {
       unocss({
         transformers: [
           transformerDirectives(),
+          transformerVariantGroup(),
         ],
       }),
       vue(),

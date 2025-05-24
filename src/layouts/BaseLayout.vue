@@ -8,7 +8,9 @@ import AppHeader from '@/components/biz/AppHeader.vue'
       <AppHeader />
     </div>
     <main class="flex-1 overflow-y-auto">
-      <RouterView />
+      <div class="w-full flex flex-row justify-center">
+        <RouterView />
+      </div>
     </main>
   </div>
 </template>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ElMessage, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useRequest } from 'vue-request'
 import EpCopyDocument from '~icons/ep/copy-document'
+import EpSearch from '~icons/ep/search'
 import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import { searchAppInfos } from '@/data/app-info'
 
@@ -11,7 +12,7 @@ const { t } = useLocale()
 
 const searchModel = ref<{ token: string, value: string }[]>([])
 
-const byNameText = computed(() => searchModel.value.filter(item => item.token === 'byName').map(item => item.value).join(' '))
+const byNameText = computed(() => searchModel.value.filter(item => item.token === 'byName' || item.token === undefined).map(item => item.value).join(' '))
 const byPackageNameText = computed(() => searchModel.value.filter(item => item.token === 'byPackageName').map(item => item.value).join(' '))
 const byMainActivityText = computed(() => searchModel.value.filter(item => item.token === 'byMainActivity').map(item => item.value).join(' '))
 const pagination = ref({
@@ -41,6 +42,8 @@ const searchConfigs = computed(() => [
   },
 ])
 
+const extraSearchRef = useTemplateRef('extraSearchRef')
+
 const { data, loading, runAsync } = useRequest(() => searchAppInfos(pickBy({
   page: pagination.value.page,
   pageSize: pagination.value.pageSize,
@@ -62,11 +65,15 @@ async function handleCopy(id: string) {
 </script>
 
 <template>
-  <div class="w-full h-full p-4 flex flex-col gap-4">
+  <div class="w-full max-w-5xl h-full p-4 flex flex-col gap-4">
     <ElText class="text-2xl font-bold">
       App Tracker for Icon Pack
     </ElText>
-    <ExtraSearch v-model="searchModel" :configs="searchConfigs" @search="handleSearch" />
+    <ExtraSearch ref="extraSearchRef" v-model="searchModel" :configs="searchConfigs" :placeholder="t('searchPlaceholder')" @search="handleSearch">
+      <template #append>
+        <ElButton :icon="EpSearch" @click="extraSearchRef?.search()" />
+      </template>
+    </ExtraSearch>
     <div class="flex-1 flex flex-col items-end gap-4">
       <ElTable
         v-if="data"

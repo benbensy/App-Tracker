@@ -5,22 +5,27 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 import EpSearch from '~icons/ep/search'
 
 interface SearchConfig {
-  token: string
+  token: string | undefined
   label: string
   suggestions?: string[]
 }
 
 interface ModelItem {
-  token: string
+  token: string | undefined
   value: string
 }
 
 interface Props {
   modelValue: ModelItem[]
   configs: SearchConfig[]
+  predicate?: string
+  placeholder?: string
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  predicate: ':',
+  placeholder: '',
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: ModelItem[]): void
@@ -29,38 +34,18 @@ const emit = defineEmits<{
 
 const { t } = useLocale()
 
-const tokenMatchPattern = /(\S+):(\S*)/g
+const tokenMatchPattern = new RegExp(`(\\S+)?${props.predicate}(\\S*)`, 'g')
 
 const inputValue = ref('')
 
 const inputRef = useTemplateRef('input')
-
-// 获取所有有效的 token
-const validTokens = computed(() => props.configs.map(config => config.token))
-
-watch(() => props.modelValue, (value) => {
-  // 过滤掉不在 configs 中的 token
-  const filteredValue = value.filter((item) => {
-    if (item.token === '')
-      return true
-    return validTokens.value.includes(item.token)
-  })
-
-  inputValue.value = filteredValue
-    .map((item) => {
-      if (item.token === '')
-        return item.value
-      return `${item.token}:${item.value}`
-    })
-    .join(' ')
-}, { immediate: true, deep: true })
 
 const currentMatches = computed(() => {
   return Array.from(inputValue.value.matchAll(tokenMatchPattern))
 })
 
 watch(inputValue, (value) => {
-  const inputWords = value.split(' ').filter(word => word.trim())
+  const inputWords = value.split(/\s+/).filter(Boolean)
   const result = inputWords.map((word) => {
     const match = currentMatches.value.find(m => m[0] === word)
     if (match) {
@@ -69,24 +54,32 @@ watch(inputValue, (value) => {
         value: match[2],
       }
     }
-    return undefined
+    return {
+      token: undefined,
+      value: word,
+    }
   }).filter((item): item is ModelItem => !isUndefined(item))
 
-  // 过滤掉不在 configs 中的 token
-  const filteredResult = result.filter((item) => {
-    if (item.token === '')
-      return true
-    return validTokens.value.includes(item.token)
-  })
-
-  emit('update:modelValue', filteredResult)
+  emit('update:modelValue', result)
 })
+
+watch(() => props.modelValue, (value) => {
+  inputValue.value = value
+    .map((item) => {
+      if (item.token === undefined)
+        return item.value
+      return `${item.token}${props.predicate}${item.value}`
+    })
+    .join(' ')
+}, { immediate: true, deep: true, once: true })
 
 const currentSuggestionToken = computed(() => {
   const matches = currentMatches.value
   const lastMatch = matches.at(-1)
 
-  if (!lastMatch)
+  const isEndWithEmpty = lastMatch?.input.trimEnd().length !== lastMatch?.input.length
+
+  if (!lastMatch || isEndWithEmpty)
     return undefined
 
   const remainingText = inputValue.value.slice(lastMatch.index! + lastMatch[0].length).trimEnd()
@@ -105,7 +98,7 @@ const usedTokens = computed(() => {
   return [...new Set(props.modelValue.map(item => item.token))]
 })
 
-function handleSuggestionClick(suggestion: string) {
+function handleClickSuggestion(suggestion: string) {
   const matches = currentMatches.value
   if (matches.length === 0)
     return
@@ -114,7 +107,7 @@ function handleSuggestionClick(suggestion: string) {
   const [fullMatch, key] = lastMatch
 
   inputValue.value = `${inputValue.value.substring(0, lastMatch.index)
-  }${key}:${suggestion}${
+  }${key}${props.predicate}${suggestion}${
     inputValue.value.substring(lastMatch.index! + fullMatch.length)}`
 }
 
@@ -122,33 +115,52 @@ function handleSearch() {
   emit('search', props.modelValue)
 }
 
-function handleClickTag(token: string) {
-  emit('update:modelValue', [...props.modelValue, { token, value: '' }])
-  inputRef.value?.focus()
+async function handleClickTag(token: string | undefined) {
+  if (inputValue.value.endsWith(' ')) {
+    inputValue.value += `${token}${props.predicate}`
+  }
+  else {
+    inputValue.value += ` ${token}${props.predicate}`
+  }
 }
+
+defineExpose({
+  search: handleSearch,
+})
+
+const isFocused = ref(false)
 </script>
 
 <template>
   <el-card body-class="p-0 rounded-xl" shadow="never">
     <div class="flex flex-col">
-      <ElInput
-        ref="input"
-        v-model="inputValue"
-        :prefix-icon="EpSearch"
-        clearable
-        @keyup.enter="handleSearch"
-      />
-      <div v-show="currentSuggestions.length > 0" class="w-full flex flex-col items-start p-2">
-        <ElText v-for="suggestion in currentSuggestions" :key="suggestion" size="small" class="w-full rounded cursor-pointer px-2 hover:bg-gray-100 p-1 text-left" @click="handleSuggestionClick(suggestion)">
+      <div>
+        <ElInput
+          ref="input"
+          v-model="inputValue"
+          :prefix-icon="EpSearch"
+          clearable
+          :placeholder="placeholder"
+          @keyup.enter="handleSearch"
+          @focus="isFocused = true"
+          @blur="isFocused = false"
+        >
+          <template v-for="(_, name) in $slots" :key="name" #[name]="slotProps">
+            <slot :name="name" v-bind="slotProps" />
+          </template>
+        </ElInput>
+      </div>
+      <div v-show="currentSuggestions.length > 0 && isFocused" class="w-full flex flex-col items-start p-2">
+        <ElText v-for="suggestion in currentSuggestions" :key="suggestion" size="small" class="w-full rounded cursor-pointer px-2 hover:bg-gray-100 p-1 text-left" @click="handleClickSuggestion(suggestion)" @mousedown.prevent>
           {{ suggestion }}
         </ElText>
       </div>
     </div>
-    <template #footer>
+    <template v-if="isFocused" #footer>
       <div class="flex flex-row flex-wrap items-center gap-2">
         <ElText>{{ t('searchConditions') }}: </ElText>
         <div class="flex flex-row gap-2">
-          <ElTag v-for="config in configs" :key="config.token" :class="{ 'is-used': usedTokens.includes(config.token) }" class="cursor-pointer" @click="handleClickTag(config.token)">
+          <ElTag v-for="config in configs" :key="config.token" :class="{ 'is-used': usedTokens.includes(config.token) }" class="cursor-pointer" @click="handleClickTag(config.token)" @mousedown.prevent>
             {{ config.label }}
           </ElTag>
         </div>

@@ -15,8 +15,8 @@ importers:
         specifier: ^13.2.0
         version: 13.2.0(rxjs@7.8.2)(vue@3.5.14(typescript@5.8.3))
       app-info-parser-dist:
-        specifier: git+https://github.com/benbensy/app-info-parser.git#develop
-        version: https://codeload.github.com/benbensy/app-info-parser/tar.gz/ca47580d93c1a67eac786b5ed257af7dd368d1d2
+        specifier: git+https://github.com/benbensy/app-info-parser.git
+        version: https://codeload.github.com/benbensy/app-info-parser/tar.gz/3a5bafdf34aca936534f59937dddc9434b0f2c36
       axios:
         specifier: ^1.9.0
         version: 1.9.0
@@ -1137,10 +1137,9 @@ packages:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
 
-  app-info-parser-dist@https://codeload.github.com/benbensy/app-info-parser/tar.gz/ca47580d93c1a67eac786b5ed257af7dd368d1d2:
-    resolution: {tarball: https://codeload.github.com/benbensy/app-info-parser/tar.gz/ca47580d93c1a67eac786b5ed257af7dd368d1d2}
-    version: 1.0.0
-    engines: {node: '>=10'}
+  app-info-parser-dist@https://codeload.github.com/benbensy/app-info-parser/tar.gz/3a5bafdf34aca936534f59937dddc9434b0f2c36:
+    resolution: {tarball: https://codeload.github.com/benbensy/app-info-parser/tar.gz/3a5bafdf34aca936534f59937dddc9434b0f2c36}
+    version: 1.0.1
 
   are-docs-informative@0.0.2:
     resolution: {integrity: sha512-ixiS0nLNNG5jNQzgZJNoUpBKdo9yTYZMGJ+QgT2jmjR7G7+QHRCc4v6LQ3NgE7EBJq+o0ams3waJwkrlBom8Ig==}
@@ -4140,7 +4139,7 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  app-info-parser-dist@https://codeload.github.com/benbensy/app-info-parser/tar.gz/ca47580d93c1a67eac786b5ed257af7dd368d1d2:
+  app-info-parser-dist@https://codeload.github.com/benbensy/app-info-parser/tar.gz/3a5bafdf34aca936534f59937dddc9434b0f2c36:
     dependencies:
       bplist-parser: 0.2.0
       bytebuffer: 5.0.1

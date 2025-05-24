@@ -1,59 +1,41 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-import BaseLayout from '@/layouts/BaseLayout.vue'
-import DesignerLayout from '@/layouts/DesignerLayout.vue'
-import DesignerHomePage from '@/pages/DesignerHomePage.vue'
-import HomePage from '@/pages/HomePage.vue'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     name: 'root',
     path: '/',
-    component: BaseLayout,
+    component: () => import('@/layouts/BaseLayout.vue'),
     redirect: { name: 'home' },
     children: [
       {
         name: 'home',
         path: '/',
-        component: HomePage,
+        component: () => import('@/pages/HomePage.vue'),
       },
     ],
   },
   {
     name: 'designer-root',
     path: '/designer',
-    component: DesignerLayout,
+    component: () => import('@/layouts/DesignerLayout.vue'),
     redirect: { name: 'designer-home' },
     children: [
       {
         name: 'designer-home',
-        path: '/designer',
-        component: DesignerHomePage,
+        path: '',
+        component: () => import('@/pages/DesignerHomePage.vue'),
       },
     ],
   },
-  {
-    name: 'auth',
-    path: '/auth',
-    children: [
-      {
-        name: 'auth-sign-in',
-        path: 'signIn',
-        component: () => import('@/pages/SignInPage.vue'),
-      },
-      {
-        name: 'auth-sign-up',
-        path: 'signUp',
-        component: () => import('@/pages/SignUpPage.vue'),
-      },
-    ],
-  },
-
-] satisfies RouteRecordRaw[]
+]
 
 export const router = createRouter({
-  history: createWebHistory('/'),
+  history: createWebHistory(),
   routes,
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
 export default router

@@ -8,17 +8,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ActionButton: typeof import('./src/components/ActionButton.vue')['default']
     AppHeader: typeof import('./src/components/biz/AppHeader.vue')['default']
     AppInfoSubForm: typeof import('./src/components/biz/AppInfoSubForm.vue')['default']
-    copy: typeof import('./src/components/ExtraSearch copy.vue')['default']
     DesignerHeader: typeof import('./src/components/biz/DesignerHeader.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
     ElCard: typeof import('element-plus/es')['ElCard']
-    ElCarousel: typeof import('element-plus/es')['ElCarousel']
-    ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElDrawer: typeof import('element-plus/es')['ElDrawer']
@@ -30,17 +26,13 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElImage: typeof import('element-plus/es')['ElImage']
     ElInput: typeof import('element-plus/es')['ElInput']
-    ElLink: typeof import('element-plus/es')['ElLink']
     ElPagination: typeof import('element-plus/es')['ElPagination']
-    ElPopover: typeof import('element-plus/es')['ElPopover']
-    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
-    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     ExtraSearch: typeof import('./src/components/base/ExtraSearch.vue')['default']
     LanguageSelector: typeof import('./src/components/biz/LanguageSelector.vue')['default']
@@ -49,7 +41,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UploadAppInfo: typeof import('./src/components/biz/UploadAppInfo.vue')['default']
-    UploadAppInfoForm: typeof import('./src/components/biz/UploadAppInfoForm.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

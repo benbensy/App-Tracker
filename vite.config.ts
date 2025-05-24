@@ -50,10 +50,10 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       proxy: {
-        '/api/': {
+        [`${env.VITE_APP_API_PREFIX}/`]: {
           target: env.VITE_APP_API_URL,
           changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, ''),
+          rewrite: path => path.replace(new RegExp(`^${env.VITE_APP_API_PREFIX}\/`), ''),
           secure: false,
         },
       },

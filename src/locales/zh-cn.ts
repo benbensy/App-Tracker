@@ -26,4 +26,8 @@ export default {
   inputValueRequired: '请输入搜索内容',
   copySuccess: '复制成功',
   icon: '图标',
+  batchOperation: '批量操作',
+  copyAppFilterItem: '复制 App Filter Item',
+  copyAppFilter: '复制 App Filter',
+  export: '导出',
 }

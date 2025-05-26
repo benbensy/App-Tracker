@@ -7,6 +7,7 @@ import ExtraSearch from '@/components/base/ExtraSearch.vue'
 import TooltipProvider from '@/components/base/TooltipProvider/TooltipProvider.vue'
 import { searchAppInfos } from '@/data/app-info'
 import AppInfoPanel from '@/pages/HomePage/AppInfoPanel.vue'
+import OperationPanel from '@/pages/HomePage/OperationPanel.vue'
 
 const { t } = useLocale()
 
@@ -70,13 +71,6 @@ function handleSelectionChange(selection: any[]) {
   selectedRows.value = selection
 }
 
-const hoverRef = ref()
-
-function handleHoverCol(cur: InstanceType<typeof ElText>) {
-  console.log(cur)
-
-  hoverRef.value = cur
-}
 </script>
 
 <template>
@@ -135,12 +129,13 @@ function handleHoverCol(cur: InstanceType<typeof ElText>) {
           </div>
         </div>
 
-        <div v-if="selectedRows.length > 0" class="w-full max-w-md h-full">
+        <div v-if="selectedRows.length > 0" class="w-full max-w-md h-full flex flex-col gap-2">
           <ElCarousel :autoplay="false" indicator-position="none">
             <ElCarouselItem v-for="item in selectedRows" :key="item.packageName">
               <AppInfoPanel class="h-full" :row="item" />
             </ElCarouselItem>
           </ElCarousel>
+          <OperationPanel :rows="selectedRows" />
         </div>
       </div>
     </div>

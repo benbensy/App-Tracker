@@ -4,7 +4,6 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { transformerDirectives, transformerVariantGroup } from 'unocss'
 import unocss from 'unocss/vite'
-import autoImport from 'unplugin-auto-import/vite'
 import icons from 'unplugin-icons/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import vueComponents from 'unplugin-vue-components/vite'
@@ -26,13 +25,6 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       nodePolyfills(),
-      autoImport({
-        resolvers: [
-          ElementPlusResolver({
-            importStyle: false,
-          }),
-        ],
-      }),
       vueComponents({
         resolvers: [
           ElementPlusResolver({

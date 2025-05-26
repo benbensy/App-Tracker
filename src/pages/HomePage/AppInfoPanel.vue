@@ -1,13 +1,24 @@
 <script setup lang="ts">
-import { useLocale } from 'element-plus'
-
-defineProps<{ row: any }>()
+import { createAppFilterItem } from '@/utils/appFilter';
+import { ElMessage, useLocale } from 'element-plus'
+import EpCopyDocument from '~icons/ep/copy-document';
+const props = defineProps<{ row: any }>()
 
 const { t } = useLocale()
+
+async function handleCopyAppFilterItem() {
+    const appFilter = createAppFilterItem({
+        ...props.row,
+        appName: props.row.defaultName,
+    })
+
+    await navigator.clipboard.writeText(appFilter)
+    ElMessage.success(t('copySuccess'))
+}
 </script>
 
 <template>
-  <div class="w-full h-full p-6 bg-gray-50 flex flex-col gap-2">
+  <div class="w-full h-full px-6 py-4 bg-gray-50 flex flex-col gap-2">
     <!-- App Icon -->
     <div class="flex items-center gap-4">
       <ElText class="w-20 flex-shrink-0">
@@ -47,6 +58,21 @@ const { t } = useLocale()
       </ElText>
       <ElText class="flex-1">
         {{ row.mainActivity }}
+      </ElText>
+    </div>
+
+    <!-- Operation -->
+    <div class="flex gap-4">
+      <ElText class="w-20 flex-shrink-0">
+        {{ t('operation') }}:
+      </ElText>
+      <ElText class="flex-1">
+        <ElButton type="primary" link :icon="EpCopyDocument" @click="handleCopyAppFilterItem">
+          {{ t('copyAppFilterItem') }}
+        </ElButton>
+        <ElButton type="primary" link>
+          {{ t('export') }}
+        </ElButton>
       </ElText>
     </div>
   </div>

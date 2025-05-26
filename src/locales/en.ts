@@ -26,4 +26,8 @@ export default {
   inputValueRequired: 'Input value required',
   copySuccess: 'Copy success',
   icon: 'Icon',
+  batchOperation: 'Batch Operation',
+  copyAppFilterItem: 'Copy App Filter Item',
+  copyAppFilter: 'Copy App Filter',
+  export: 'Export',
 }

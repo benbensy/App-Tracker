@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ElMessage, ElCarousel, ElCarouselItem, useLocale } from 'element-plus'
+import { ElCarousel, ElCarouselItem, ElMessage, ElText, useLocale } from 'element-plus'
 import { pickBy } from 'es-toolkit'
 import { computed, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import ExtraSearch from '@/components/base/ExtraSearch.vue'
+import TooltipProvider from '@/components/base/TooltipProvider/TooltipProvider.vue'
 import { searchAppInfos } from '@/data/app-info'
 import AppInfoPanel from '@/pages/HomePage/AppInfoPanel.vue'
 
@@ -68,6 +69,14 @@ function handleSelectionChange(selection: any[]) {
 
   selectedRows.value = selection
 }
+
+const hoverRef = ref()
+
+function handleHoverCol(cur: InstanceType<typeof ElText>) {
+  console.log(cur)
+
+  hoverRef.value = cur
+}
 </script>
 
 <template>
@@ -78,33 +87,41 @@ function handleSelectionChange(selection: any[]) {
     <div class="w-full flex-1 flex flex-col gap-4">
       <div class="w-full flex flex-row justify-between gap-4">
         <div v-if="hasSearched || data" v-loading="loading" class="w-full flex-1 grid gap-4">
-          <ElTable
-            :data="data?.data?.items || []"
-            @selection-change="handleSelectionChange"
-          >
-            <ElTableColumn width="32" type="selection" />
-            <ElTableColumn prop="defaultName" :label="t('name')">
-              <template #default="{ row }">
-                <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'defaultName')">
-                  {{ row.defaultName }}
-                </ElText>
-              </template>
-            </ElTableColumn>
-            <ElTableColumn prop="packageName" :label="t('packageName')">
-              <template #default="{ row }">
-                <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'packageName')">
-                  {{ row.packageName }}
-                </ElText>
-              </template>
-            </ElTableColumn>
-            <ElTableColumn prop="mainActivity" :label="t('mainActivity')">
-              <template #default="{ row }">
-                <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted)" @click="handleCopy(row, 'mainActivity')">
-                  {{ row.mainActivity }}
-                </ElText>
-              </template>
-            </ElTableColumn>
-          </ElTable>
+          <TooltipProvider>
+            <ElTable
+              :data="data?.data?.items || []"
+              @selection-change="handleSelectionChange"
+            >
+              <ElTableColumn width="32" type="selection" />
+              <ElTableColumn prop="defaultName" :label="t('name')">
+                <template #default="{ row }">
+                  <Tooltip :content="row.defaultName">
+                    <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted) text-ellipsis whitespace-nowrap" @click="handleCopy(row, 'defaultName')">
+                      {{ row.defaultName }}
+                    </ElText>
+                  </Tooltip>
+                </template>
+              </ElTableColumn>
+              <ElTableColumn prop="packageName" :label="t('packageName')">
+                <template #default="{ row }">
+                  <Tooltip :content="row.packageName">
+                    <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted) text-ellipsis whitespace-nowrap" @click="handleCopy(row, 'packageName')">
+                      {{ row.packageName }}
+                    </ElText>
+                  </Tooltip>
+                </template>
+              </ElTableColumn>
+              <ElTableColumn prop="mainActivity" :label="t('mainActivity')">
+                <template #default="{ row }">
+                  <Tooltip :content="row.mainActivity">
+                    <ElText class="hover:(cursor-pointer underline underline-offset-2 underline-dotted) text-ellipsis whitespace-nowrap" @click="handleCopy(row, 'mainActivity')">
+                      {{ row.mainActivity }}
+                    </ElText>
+                  </Tooltip>
+                </template>
+              </ElTableColumn>
+            </ElTable>
+          </TooltipProvider>
           <div class="w-full flex justify-end">
             <ElPagination
               v-model:current-page="pagination.page"

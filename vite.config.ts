@@ -1,6 +1,7 @@
 import path from 'node:path'
 import process from 'node:process'
 import vue from '@vitejs/plugin-vue'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 import { transformerDirectives, transformerVariantGroup } from 'unocss'
 import unocss from 'unocss/vite'
 import autoImport from 'unplugin-auto-import/vite'
@@ -47,6 +48,7 @@ export default defineConfig(({ mode }) => {
         ],
       }),
       vue(),
+      vueJsx(),
     ],
     server: {
       proxy: {

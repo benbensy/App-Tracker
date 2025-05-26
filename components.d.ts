@@ -33,6 +33,7 @@ declare module 'vue' {
     ElTabs: typeof import('element-plus/es')['ElTabs']
     ElTag: typeof import('element-plus/es')['ElTag']
     ElText: typeof import('element-plus/es')['ElText']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     ExtraSearch: typeof import('./src/components/base/ExtraSearch.vue')['default']
     LanguageSelector: typeof import('./src/components/biz/LanguageSelector.vue')['default']
@@ -40,6 +41,9 @@ declare module 'vue' {
     NavLink: typeof import('./src/components/base/NavLink.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Tooltip: typeof import('./src/components/base/TooltipProvider/Tooltip.vue')['default']
+    TooltipProvider: typeof import('./src/components/base/TooltipProvider/TooltipProvider.vue')['default']
+    TooltipSlot: typeof import('./src/components/base/TooltipProvider/TooltipSlot.vue')['default']
     UploadAppInfo: typeof import('./src/components/biz/UploadAppInfo.vue')['default']
   }
   export interface ComponentCustomProperties {

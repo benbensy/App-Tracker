@@ -2,7 +2,7 @@
 import type { FormItemProp } from 'element-plus'
 import { ElMessage, useLocale } from 'element-plus'
 import { isUndefined } from 'es-toolkit'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import EpSearch from '~icons/ep/search'
 import { useForm } from '@/composables/useForm'
 
@@ -34,6 +34,8 @@ const emit = defineEmits<{
   (e: 'search', value: ModelItem[]): void
 }>()
 
+const inputRef = useTemplateRef('inputRef')
+
 const { t } = useLocale()
 
 const tokenMatchPattern = new RegExp(`(\\S+)?${props.predicate}(\\S*)`, 'g')
@@ -42,8 +44,10 @@ const { formRef, formValues, createRules, submit, clearValidate } = useForm({
   initialValues: {
     inputValue: '',
   },
-  onSubmit() {
+  async onSubmit() {
     emit('search', props.modelValue)
+    nextTick()
+    inputRef.value?.blur()
   },
 })
 
@@ -157,6 +161,7 @@ function handleValidate(_prop: FormItemProp, isValid: boolean) {
       <ElForm ref="formRef" :model="formValues" :rules="rules" @validate="handleValidate" @submit.prevent>
         <ElFormItem class="mb-0" prop="inputValue">
           <ElInput
+            ref="inputRef"
             v-model="formValues.inputValue"
             :prefix-icon="EpSearch"
             clearable

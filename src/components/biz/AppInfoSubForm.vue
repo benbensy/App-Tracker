@@ -14,8 +14,8 @@ const { t } = useLocale()
     <ElFormItem :label="t('languageCode')">
       <ElInput :model-value="languageCode" :placeholder="t('languageCode')" />
     </ElFormItem>
-    <ElFormItem :label="t('localizedNames')">
-      <ElInput :model-value="localizedNames" :placeholder="t('localizedNames')" />
+    <ElFormItem :label="t('localizedName')">
+      <ElInput :model-value="localizedNames" :placeholder="t('localizedName')" />
     </ElFormItem>
   </ElForm>
 </template>

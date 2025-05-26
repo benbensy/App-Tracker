@@ -1,31 +1,62 @@
-<script setup lang="ts">
-import { h, ref } from 'vue';
+<script lang="ts">
+import { isFunction } from 'es-toolkit'
+import { defineComponent, h, ref } from 'vue'
 import { useTooltipContext } from './composable'
 
-const props = defineProps<{content: string}>()
+export default defineComponent({
+  name: 'Tooltip',
+  props: {
+    content: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props, { slots }) {
+    const context = useTooltipContext()
+    const slotRef = ref<HTMLElement | null>(null)
 
-const slots = defineSlots()
+    function handleMouseEnter() {
+      context.visible.value = true
+      context.content.value = props.content
+      context.virtualRef.value = slotRef.value
+    }
 
-const componentRef = ref<any>()
+    function handleMouseLeave() {
+      context.visible.value = false
+      context.content.value = undefined
+      context.virtualRef.value = undefined
+    }
 
-const context = useTooltipContext()
+    return () => {
+      const slotContent = slots.default?.()
+      if (!slotContent || slotContent.length === 0)
+        return null
 
-const SlotComponent = (props: any) => h(slots.default?.()[0], { ref: componentRef, onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave, ...props})
+      const vnode = slotContent[0]
+      if (!vnode)
+        return null
 
-function handleMouseEnter() {    
-  context.visible.value = true
-  context.content.value = props.content
-  context.virtualRef.value = componentRef.value
-}
-
-function handleMouseLeave() {
-  context.visible.value = false
-  context.content.value = undefined
-  context.virtualRef.value = undefined
-}
-
+      return h(vnode, {
+        ...vnode.props,
+        ref: (el: any) => {
+          slotRef.value = el
+          if (isFunction(vnode.ref)) {
+            vnode.ref(el)
+          }
+          else if (vnode.ref) {
+            (vnode.ref as any).value = el
+          }
+        },
+        onMouseenter: (e: Event) => {
+          handleMouseEnter()
+          vnode.props?.onMouseenter?.(e)
+        },
+        onMouseleave: (e: Event) => {
+          handleMouseLeave()
+          vnode.props?.onMouseleave?.(e)
+        },
+      })
+    }
+  },
+})
 </script>
-
-<template>
-  <SlotComponent @mouseenter.stop="handleMouseEnter" @mouseleave.stop="handleMouseLeave" />
-</template>
